@@ -29,6 +29,11 @@ jobs:
             fi
           fi
 
+      - name: Force Java 17 Compatibility Settings
+        run: |
+          find . -name "build.gradle*" -exec sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g' {} +
+          find . -name "build.gradle*" -exec sed -i 's/"1.8"/"17"/g' {} +
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -44,9 +49,9 @@ jobs:
         run: |
           if [ -f "./gradlew" ]; then
             chmod +x gradlew
-            ./gradlew assembleDebug -Pkotlin.compiler.jvmTarget=1.8
+            ./gradlew assembleDebug
           else
-            gradle assembleDebug -Pkotlin.compiler.jvmTarget=1.8
+            gradle assembleDebug
           fi
 
       - name: Upload APK
