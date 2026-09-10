@@ -69,9 +69,9 @@ fun TelemetryRunnerApp() {
 
     DisposableEffect(videoUri) {
         player?.release()
-        player = videoUri?.let {
+        player = videoUri?.let { uri ->
             ExoPlayer.Builder(context).build().apply {
-                setMediaItem(MediaItem.fromUri(it))
+                setMediaItem(MediaItem.fromUri(uri))
                 prepare()
                 playWhenReady = false
             }
@@ -81,47 +81,68 @@ fun TelemetryRunnerApp() {
 
     MaterialTheme(colorScheme = darkColorScheme(primary = Color(0xFF64B5F6))) {
         Column(
-            Modifier.fillMaxSize().background(Color(0xFF101114))
-                .verticalScroll(rememberScrollState()).padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF101114))
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
         ) {
             Text("Telemetry Runner", fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Text("V1 — running video telemetry overlay", color = Color.LightGray)
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            if (player != null) {
+            val currentPlayer = player
+            if (currentPlayer != null) {
                 AndroidView(
-                    factory = { ctx -> PlayerView(ctx).apply {
-                        this.player = player
-                        useController = true
-                    }},
-                    modifier = Modifier.fillMaxWidth().height(230.dp)
+                    factory = { ctx ->
+                        PlayerView(ctx).apply {
+                            useController = true
+                        }
+                    },
+                    update = { view ->
+                        view.player = currentPlayer
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(230.dp)
                 )
             } else {
                 Box(
-                    Modifier.fillMaxWidth().height(230.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(230.dp)
                         .background(Color.Black, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
-                ) { Text("Select a running video", color = Color.Gray) }
+                ) { 
+                    Text("Select a running video", color = Color.Gray) 
+                }
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Button(
                 onClick = { videoPicker.launch(arrayOf("video/*")) },
-                Modifier.fillMaxWidth()
-            ) { Text(if (videoUri == null) "1. Select Video" else "Change Video") }
+                modifier = Modifier.fillMaxWidth()
+            ) { 
+                Text(if (videoUri == null) "1. Select Video" else "Change Video") 
+            }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedButton(
                 onClick = { activityPicker.launch(arrayOf("*/*")) },
-                Modifier.fillMaxWidth()
-            ) { Text(if (activityUri == null) "2. Select FIT / GPX / TCX" else "Change Activity File") }
+                modifier = Modifier.fillMaxWidth()
+            ) { 
+                Text(if (activityUri == null) "2. Select FIT / GPX / TCX" else "Change Activity File") 
+            }
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             Text("Telemetry overlay", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Box(
-                Modifier.fillMaxWidth().height(180.dp)
-                    .background(Color.Black, RoundedCornerShape(12.dp)).padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .background(Color.Black, RoundedCornerShape(12.dp))
+                    .padding(16.dp)
             ) {
                 Column {
                     Text("10 SEP 2026     09:42:18", color = Color.White, fontWeight = FontWeight.Bold)
@@ -132,7 +153,7 @@ fun TelemetryRunnerApp() {
                 }
             }
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             Text("Video / activity synchronization", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             Text("Offset: ${offsetSeconds.toInt()} seconds", color = Color.LightGray)
             Slider(
@@ -142,16 +163,19 @@ fun TelemetryRunnerApp() {
             )
 
             Button(
-                enabled = videoUri != null && activityUri != null,
                 onClick = { /* Renderer is next milestone */ },
-                Modifier.fillMaxWidth()
-            ) { Text("Export MP4") }
+                enabled = videoUri != null && activityUri != null,
+                modifier = Modifier.fillMaxWidth()
+            ) { 
+                Text("Export MP4") 
+            }
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             Text(
                 "Prototype build: selection, playback, overlay preview and sync controls. " +
                 "Actual FIT/GPX/TCX parsing and video compositing are not yet implemented.",
-                color = Color.Gray, fontSize = 13.sp
+                color = Color.Gray, 
+                fontSize = 13.sp
             )
         }
     }
